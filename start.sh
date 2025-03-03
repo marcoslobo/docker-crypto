@@ -16,7 +16,7 @@ INIT_LAUNCH="False"
 INIT_LAUNCH_FILE="./volumes/.init"
 
 # Set bitcoin network used. Default is mainnet. Other options are testnet, regtest and signet.
-STACK_CRYPTO_NETWORK="testnet4"
+STACK_CRYPTO_NETWORK="mainnet"
 
 # Toggle optional script features. Change this if needed, as per your preference.
 STACK_CHECK_UPDATES="False" ## Check for system updates using APT package manager.
