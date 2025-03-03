@@ -12,7 +12,7 @@ services:
       - "${APP_BITCOIND_P2P_PORT}:${APP_BITCOIND_P2P_PORT}"
       - "${APP_BITCOIND_RPC_PORT}:${APP_BITCOIND_RPC_PORT}"
     volumes:
-      - "../volumes/bitcoin/node:/data/.bitcoin"
+      - "../volumes/bitcoin/node:/root/.bitcoin"
     networks:
       default:
         ipv4_address: "${APP_BITCOIND_IP}"
