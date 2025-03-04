@@ -374,13 +374,15 @@ done
 echo -e " > ${CINFO}Generating bitcoin node details...${COFF}"
 BITCOIN_RPC_USERNAME="${STACK_BITCOIND_USERNAME}"
 
-if [[ ${STACK_BITCOIND_PASSWORD} == "" ]]; then
-	BITCOIN_RPC_DETAILS=$("./scripts/rpcauth.py" "${BITCOIN_RPC_USERNAME}")
-	BITCOIN_RPC_PASSWORD=$(echo -e "$BITCOIN_RPC_DETAILS" | tail -1)
-else
-	BITCOIN_RPC_DETAILS=$("./scripts/rpcauth.py" "${BITCOIN_RPC_USERNAME}" "${STACK_BITCOIND_PASSWORD}")
-	BITCOIN_RPC_PASSWORD="${STACK_BITCOIND_PASSWORD}"
-fi
+# if [[ ${STACK_BITCOIND_PASSWORD} == "" ]]; then
+# 	BITCOIN_RPC_DETAILS=$("./scripts/rpcauth.py" "${BITCOIN_RPC_USERNAME}")
+# 	BITCOIN_RPC_PASSWORD=$(echo -e "$BITCOIN_RPC_DETAILS" | tail -1)
+# else
+# 	BITCOIN_RPC_DETAILS=$("./scripts/rpcauth.py" "${BITCOIN_RPC_USERNAME}" "${STACK_BITCOIND_PASSWORD}")
+# 	BITCOIN_RPC_PASSWORD="${STACK_BITCOIND_PASSWORD}"
+# fi
+
+BITCOIN_RPC_DETAILS="${BITCOIN_RPC_USERNAME}:${STACK_BITCOIND_PASSWORD}"
 
 BITCOIN_RPC_AUTH=$(echo -e "$BITCOIN_RPC_DETAILS" | head -2 | tail -1 | sed -e "s/^rpcauth=//")
 echo -e " > ${CSUCCESS}Bitcoin node details generated successfully!${COFF}"
