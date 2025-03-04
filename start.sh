@@ -436,198 +436,198 @@ else
 	echo -e " > ${CINFO}Bitcoin Node UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_BITCOIN_GUI_PORT} ${COFF}"
 fi
 
-# # Runs the 'electrs', 'electrs_gui' and 'explorer' containers.
-# echo -e " > ${CINFO}Running electrs electrs_gui and explorer containers...${COFF}"
-# if [[ ${STACK_RUN_MEMPOOL_SPACE} == "False" ]]; then
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-electrs.yml up --detach electrs electrs_gui btc_explorer
-# else
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-electrs.yml up --detach electrs electrs_gui mempool_space_web mempool_space_api mempool_space_db
-# fi
-# echo -e " > ${CSUCCESS}Containers launched!${COFF}"
+# Runs the 'electrs', 'electrs_gui' and 'explorer' containers.
+echo -e " > ${CINFO}Running electrs electrs_gui and explorer containers...${COFF}"
+if [[ ${STACK_RUN_MEMPOOL_SPACE} == "False" ]]; then
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-electrs.yml up --detach electrs electrs_gui btc_explorer
+else
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-electrs.yml up --detach electrs electrs_gui mempool_space_web mempool_space_api mempool_space_db
+fi
+echo -e " > ${CSUCCESS}Containers launched!${COFF}"
 
-# # Checks if 'electrs_gui' is running.
-# if ( ! docker logs electrs_gui > /dev/null); then
-# 	echo -e " > ${CERROR}Electrum Server UI is not running due to an error.${COFF}"
-# 	exit 1
-# else
-# 	echo -e " > ${CINFO}Electrum Server UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_ELECTRS_GUI_PORT} ${COFF}"
-# fi
+# Checks if 'electrs_gui' is running.
+if ( ! docker logs electrs_gui > /dev/null); then
+	echo -e " > ${CERROR}Electrum Server UI is not running due to an error.${COFF}"
+	exit 1
+else
+	echo -e " > ${CINFO}Electrum Server UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_ELECTRS_GUI_PORT} ${COFF}"
+fi
 
-# if [[ ${STACK_RUN_MEMPOOL_SPACE} == "False" ]]; then
-# 	if ( ! docker logs btc_explorer > /dev/null); then
-# 		echo -e " > ${CERROR}BTC RPC Explorer is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}BTC RPC Explorer is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_MEMPOOL_PORT} ${COFF}"
-# 	fi
-# else 
-# 	if ( ! docker logs mempool_space_web > /dev/null); then
-# 		echo -e " > ${CERROR}Mempool Space Explorer is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}Mempool Space Explorer is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_MEMPOOL_PORT} ${COFF}"
-# 	fi
-# fi
+if [[ ${STACK_RUN_MEMPOOL_SPACE} == "False" ]]; then
+	if ( ! docker logs btc_explorer > /dev/null); then
+		echo -e " > ${CERROR}BTC RPC Explorer is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}BTC RPC Explorer is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_MEMPOOL_PORT} ${COFF}"
+	fi
+else 
+	if ( ! docker logs mempool_space_web > /dev/null); then
+		echo -e " > ${CERROR}Mempool Space Explorer is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}Mempool Space Explorer is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_MEMPOOL_PORT} ${COFF}"
+	fi
+fi
 
-# # Runs the lightning container stack if toggled active.
-# if [[ ${STACK_RUN_LIGHTNING_SERVER} == "True" ]]; then
+# Runs the lightning container stack if toggled active.
+if [[ ${STACK_RUN_LIGHTNING_SERVER} == "True" ]]; then
 
-# 	# Generates command arguments for the lnd container.
-# 	BIN_ARGS_LND=()
-# 	BIN_ARGS_LND+=( "--configfile=/data/.lnd/umbrel-lnd.conf" )
-# 	BIN_ARGS_LND+=( "--listen=0.0.0.0:${STACK_LIGHTNING_NODE_PORT}" )
-# 	BIN_ARGS_LND+=( "--rpclisten=0.0.0.0:${STACK_LIGHTNING_NODE_GRPC_PORT}" )
-# 	BIN_ARGS_LND+=( "--restlisten=0.0.0.0:${STACK_LIGHTNING_NODE_REST_PORT}" )
-# 	BIN_ARGS_LND+=( "--bitcoin.active" )
-# 	BIN_ARGS_LND+=( "--bitcoin.${STACK_CRYPTO_NETWORK}" )
-# 	BIN_ARGS_LND+=( "--bitcoin.node=bitcoind" )
-# 	BIN_ARGS_LND+=( "--bitcoind.rpchost=${STACK_BITCOIND_IP}:${STACK_BITCOIND_RPC_PORT}" )
-# 	BIN_ARGS_LND+=( "--bitcoind.rpcuser=${BITCOIN_RPC_USERNAME}" )
-# 	BIN_ARGS_LND+=( "--bitcoind.rpcpass=${BITCOIN_RPC_PASSWORD}" )
-# 	BIN_ARGS_LND+=( "--bitcoind.zmqpubrawblock=tcp://${STACK_BITCOIND_IP}:${STACK_BITCOIND_PUB_RAW_BLOCK_PORT}" )
-# 	BIN_ARGS_LND+=( "--bitcoind.zmqpubrawtx=tcp://${STACK_BITCOIND_IP}:${STACK_BITCOIND_PUB_RAW_TX_PORT}" )
-# 	BIN_ARGS_LND+=( "--tor.active" )
-# 	BIN_ARGS_LND+=( "--tor.v3" )
-# 	BIN_ARGS_LND+=( "--tor.control=${APP_TOR_IP}:${APP_TOR_CONTROL_PORT}" )
-# 	BIN_ARGS_LND+=( "--tor.socks=${APP_TOR_IP}:${APP_TOR_SOCKS_PORT}" )
-# 	BIN_ARGS_LND+=( "--tor.targetipaddress=${APP_LIGHTNING_NODE_IP}" )
-# 	BIN_ARGS_LND+=( "--tor.password=${APP_TOR_HASHED_PASSWORD}" )
+	# Generates command arguments for the lnd container.
+	BIN_ARGS_LND=()
+	BIN_ARGS_LND+=( "--configfile=/data/.lnd/umbrel-lnd.conf" )
+	BIN_ARGS_LND+=( "--listen=0.0.0.0:${STACK_LIGHTNING_NODE_PORT}" )
+	BIN_ARGS_LND+=( "--rpclisten=0.0.0.0:${STACK_LIGHTNING_NODE_GRPC_PORT}" )
+	BIN_ARGS_LND+=( "--restlisten=0.0.0.0:${STACK_LIGHTNING_NODE_REST_PORT}" )
+	BIN_ARGS_LND+=( "--bitcoin.active" )
+	BIN_ARGS_LND+=( "--bitcoin.${STACK_CRYPTO_NETWORK}" )
+	BIN_ARGS_LND+=( "--bitcoin.node=bitcoind" )
+	BIN_ARGS_LND+=( "--bitcoind.rpchost=${STACK_BITCOIND_IP}:${STACK_BITCOIND_RPC_PORT}" )
+	BIN_ARGS_LND+=( "--bitcoind.rpcuser=${BITCOIN_RPC_USERNAME}" )
+	BIN_ARGS_LND+=( "--bitcoind.rpcpass=${BITCOIN_RPC_PASSWORD}" )
+	BIN_ARGS_LND+=( "--bitcoind.zmqpubrawblock=tcp://${STACK_BITCOIND_IP}:${STACK_BITCOIND_PUB_RAW_BLOCK_PORT}" )
+	BIN_ARGS_LND+=( "--bitcoind.zmqpubrawtx=tcp://${STACK_BITCOIND_IP}:${STACK_BITCOIND_PUB_RAW_TX_PORT}" )
+	BIN_ARGS_LND+=( "--tor.active" )
+	BIN_ARGS_LND+=( "--tor.v3" )
+	BIN_ARGS_LND+=( "--tor.control=${APP_TOR_IP}:${APP_TOR_CONTROL_PORT}" )
+	BIN_ARGS_LND+=( "--tor.socks=${APP_TOR_IP}:${APP_TOR_SOCKS_PORT}" )
+	BIN_ARGS_LND+=( "--tor.targetipaddress=${APP_LIGHTNING_NODE_IP}" )
+	BIN_ARGS_LND+=( "--tor.password=${APP_TOR_HASHED_PASSWORD}" )
 
-# 	# Generated command is exported to the compose file.
-# 	export APP_LIGHTNING_COMMAND=$(IFS=" "; echo "${BIN_ARGS_LND[@]}")
+	# Generated command is exported to the compose file.
+	export APP_LIGHTNING_COMMAND=$(IFS=" "; echo "${BIN_ARGS_LND[@]}")
 
-# 	# Runs the 'lnd' and 'lnd_gui' containers.
-# 	echo -e " > ${CINFO}Running lnd and lnd_gui containers...${COFF}"
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-lightning.yml up --detach lnd lnd_gui
-# 	echo -e " > ${CSUCCESS}Containers launched!${COFF}"
+	# Runs the 'lnd' and 'lnd_gui' containers.
+	echo -e " > ${CINFO}Running lnd and lnd_gui containers...${COFF}"
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-lightning.yml up --detach lnd lnd_gui
+	echo -e " > ${CSUCCESS}Containers launched!${COFF}"
 
-# 	# Checks if 'lnd_gui' is running.
-# 	if ( ! docker logs lnd_gui > /dev/null); then
-# 		echo -e " > ${CERROR}Lightning Node UI is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}Lightning Node UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_LIGHTNING_GUI_PORT} ${COFF}"
-# 	fi
-# else
-# 	echo -e " > ${CWARN}Lightning server disabled! Toggle in script or use the command line argument.${COFF}"
-# fi
+	# Checks if 'lnd_gui' is running.
+	if ( ! docker logs lnd_gui > /dev/null); then
+		echo -e " > ${CERROR}Lightning Node UI is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}Lightning Node UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_LIGHTNING_GUI_PORT} ${COFF}"
+	fi
+else
+	echo -e " > ${CWARN}Lightning server disabled! Toggle in script or use the command line argument.${COFF}"
+fi
 
-# # Runs the extras container stack if toggled active.
-# if [[ ${STACK_RUN_EXTRA_ORDINALS} == "True" ]]; then
+# Runs the extras container stack if toggled active.
+if [[ ${STACK_RUN_EXTRA_ORDINALS} == "True" ]]; then
 
-# 	# Runs the 'ordinals' container.
-# 	echo -e " > ${CINFO}Running ordinals container...${COFF}"
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach ordinals
-# 	echo -e " > ${CSUCCESS}Container launched!${COFF}"
+	# Runs the 'ordinals' container.
+	echo -e " > ${CINFO}Running ordinals container...${COFF}"
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach ordinals
+	echo -e " > ${CSUCCESS}Container launched!${COFF}"
 
-# 	# Checks if 'ordinals' is running.
-# 	if ( ! docker logs ordinals > /dev/null); then
-# 		echo -e " > ${CERROR}Ordinals is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}Ordinals is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_ORDINALS_PORT} ${COFF}"
-# 	fi
+	# Checks if 'ordinals' is running.
+	if ( ! docker logs ordinals > /dev/null); then
+		echo -e " > ${CERROR}Ordinals is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}Ordinals is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_ORDINALS_PORT} ${COFF}"
+	fi
 
-# fi
+fi
 
-# if [[ ${STACK_RUN_EXTRA_ADGUARD} == "True" ]]; then
+if [[ ${STACK_RUN_EXTRA_ADGUARD} == "True" ]]; then
 
-# 	# Runs the 'adguard' container.
-# 	echo -e " > ${CINFO}Running adguard container...${COFF}"
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach adguard
-# 	echo -e " > ${CSUCCESS}Container launched!${COFF}"
+	# Runs the 'adguard' container.
+	echo -e " > ${CINFO}Running adguard container...${COFF}"
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach adguard
+	echo -e " > ${CSUCCESS}Container launched!${COFF}"
 
-# 	# Checks if 'adguard' is running.
-# 	if ( ! docker logs adguard > /dev/null); then
-# 		echo -e " > ${CERROR}Adguard is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}Adguard is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_ADGUARD_PORT} ${COFF}"
-# 	fi
+	# Checks if 'adguard' is running.
+	if ( ! docker logs adguard > /dev/null); then
+		echo -e " > ${CERROR}Adguard is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}Adguard is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_ADGUARD_PORT} ${COFF}"
+	fi
 
-# fi
+fi
 
-# if [[ ${STACK_RUN_EXTRA_NOSTR_WALLET_CONNECT} == "True" ]]; then
+if [[ ${STACK_RUN_EXTRA_NOSTR_WALLET_CONNECT} == "True" ]]; then
 
-# 	# Runs the 'nostr_wallet_connect' container.
-# 	echo -e " > ${CINFO}Running nostr_wallet_connect container...${COFF}"
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach nostr_wallet_connect
-# 	echo -e " > ${CSUCCESS}Container launched!${COFF}"
+	# Runs the 'nostr_wallet_connect' container.
+	echo -e " > ${CINFO}Running nostr_wallet_connect container...${COFF}"
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach nostr_wallet_connect
+	echo -e " > ${CSUCCESS}Container launched!${COFF}"
 
-# 	# Checks if 'nostr_wallet_connect' is running.
-# 	if ( ! docker logs adguard > /dev/null); then
-# 		echo -e " > ${CERROR}Nostr Wallet Connect is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}Nostr Wallet Connect is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_NOSTR_WALLET_CONNECT_PORT} ${COFF}"
-# 	fi
+	# Checks if 'nostr_wallet_connect' is running.
+	if ( ! docker logs adguard > /dev/null); then
+		echo -e " > ${CERROR}Nostr Wallet Connect is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}Nostr Wallet Connect is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_NOSTR_WALLET_CONNECT_PORT} ${COFF}"
+	fi
 
-# fi
+fi
 
-# if [[ ${STACK_RUN_EXTRA_BACK_THAT_MAC} == "True" ]]; then
+if [[ ${STACK_RUN_EXTRA_BACK_THAT_MAC} == "True" ]]; then
 
-# 	# Runs the 'back_that_mac' and 'timemachine' containers.
-# 	echo -e " > ${CINFO}Running back_that_mac and timemachine containers...${COFF}"
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach back_that_mac timemachine
-# 	echo -e " > ${CSUCCESS}Containers launched!${COFF}"
+	# Runs the 'back_that_mac' and 'timemachine' containers.
+	echo -e " > ${CINFO}Running back_that_mac and timemachine containers...${COFF}"
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach back_that_mac timemachine
+	echo -e " > ${CSUCCESS}Containers launched!${COFF}"
 
-# 	# Checks if 'back_that_mac' is running.
-# 	if ( ! docker logs back_that_mac > /dev/null); then
-# 		echo -e " > ${CERROR}Back That Mac is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}Back That Mac is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_BACK_THAT_MAC_PORT} ${COFF}"
-# 	fi
+	# Checks if 'back_that_mac' is running.
+	if ( ! docker logs back_that_mac > /dev/null); then
+		echo -e " > ${CERROR}Back That Mac is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}Back That Mac is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_BACK_THAT_MAC_PORT} ${COFF}"
+	fi
 
-# fi
+fi
 
-# if [[ ${STACK_RUN_EXTRA_LLAMA_GPT} == "True" ]]; then
+if [[ ${STACK_RUN_EXTRA_LLAMA_GPT} == "True" ]]; then
 
-# 	# Runs the 'llama_gpt_api' and 'llama_gpt_ui' containers.
-# 	echo -e " > ${CINFO}Running llama_gpt_api and llama_gpt_ui containers...${COFF}"
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach llama_gpt_api llama_gpt_ui
-# 	echo -e " > ${CSUCCESS}Containers launched!${COFF}"
+	# Runs the 'llama_gpt_api' and 'llama_gpt_ui' containers.
+	echo -e " > ${CINFO}Running llama_gpt_api and llama_gpt_ui containers...${COFF}"
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach llama_gpt_api llama_gpt_ui
+	echo -e " > ${CSUCCESS}Containers launched!${COFF}"
 
-# 	# Checks if 'llama_gpt_ui' is running.
-# 	if ( ! docker logs llama_gpt_ui > /dev/null); then
-# 		echo -e " > ${CERROR}Llama GPT is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}Llama GPT is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_LLAMA_GPT_UI_PORT} ${COFF}"
-# 	fi
+	# Checks if 'llama_gpt_ui' is running.
+	if ( ! docker logs llama_gpt_ui > /dev/null); then
+		echo -e " > ${CERROR}Llama GPT is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}Llama GPT is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_LLAMA_GPT_UI_PORT} ${COFF}"
+	fi
 
-# fi
+fi
 
-# if [[ ${STACK_RUN_EXTRA_LIGHTNING_TERMINAL} == "True" ]]; then
+if [[ ${STACK_RUN_EXTRA_LIGHTNING_TERMINAL} == "True" ]]; then
 
-# 	# Runs the 'lightning_terminal' container.
-# 	echo -e " > ${CINFO}Running lightning_terminal container...${COFF}"
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach lightning_terminal
-# 	echo -e " > ${CSUCCESS}Container launched!${COFF}"
+	# Runs the 'lightning_terminal' container.
+	echo -e " > ${CINFO}Running lightning_terminal container...${COFF}"
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach lightning_terminal
+	echo -e " > ${CSUCCESS}Container launched!${COFF}"
 
-# 	# Checks if 'lightning_terminal' is running.
-# 	if ( ! docker logs lightning_terminal > /dev/null); then
-# 		echo -e " > ${CERROR}Lightning Terminal is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}Lightning Terminal is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_LIGHTNING_TERMINAL_PORT} ${COFF}"
-# 	fi
+	# Checks if 'lightning_terminal' is running.
+	if ( ! docker logs lightning_terminal > /dev/null); then
+		echo -e " > ${CERROR}Lightning Terminal is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}Lightning Terminal is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_LIGHTNING_TERMINAL_PORT} ${COFF}"
+	fi
 
-# fi
+fi
 
-# if [[ ${STACK_RUN_EXTRA_MYSPEED} == "True" ]]; then
+if [[ ${STACK_RUN_EXTRA_MYSPEED} == "True" ]]; then
 
-# 	# Runs the 'myspeed' container.
-# 	echo -e " > ${CINFO}Running myspeed container...${COFF}"
-# 	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach myspeed
-# 	echo -e " > ${CSUCCESS}Container launched!${COFF}"
+	# Runs the 'myspeed' container.
+	echo -e " > ${CINFO}Running myspeed container...${COFF}"
+	docker-compose --log-level ERROR -p crypto --file ./compose/docker-extras.yml up --detach myspeed
+	echo -e " > ${CSUCCESS}Container launched!${COFF}"
 
-# 	# Checks if 'myspeed' is running.
-# 	if ( ! docker logs myspeed > /dev/null); then
-# 		echo -e " > ${CERROR}My Speed is not running due to an error.${COFF}"
-# 		exit 1
-# 	else
-# 		echo -e " > ${CINFO}My Speed is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_MYSPEED_PORT} ${COFF}"
-# 	fi
+	# Checks if 'myspeed' is running.
+	if ( ! docker logs myspeed > /dev/null); then
+		echo -e " > ${CERROR}My Speed is not running due to an error.${COFF}"
+		exit 1
+	else
+		echo -e " > ${CINFO}My Speed is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_EXTRAS_MYSPEED_PORT} ${COFF}"
+	fi
 
-# fi
+fi
