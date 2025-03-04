@@ -273,7 +273,7 @@ if [[ "${INIT_LAUNCH}" == "True" ]]; then
 else
 	echo -e " > ${CINFO}Checking for container updates...${COFF}"
 fi
-docker-compose --log-level ERROR --file ./compose/docker-tor.yml --file ./compose/docker-bitcoin.yml 
+docker-compose --log-level ERROR --file ./compose/docker-tor.yml --file ./compose/docker-bitcoin.yml --file ./compose/docker-electrs.yml --file ./compose/docker-lightning.yml --file ./compose/docker-extras.yml pull
 echo -e " > ${CSUCCESS}Docker containers have been pulled as needed!${COFF}"
 
 # Hashes provided tor password.
@@ -429,12 +429,12 @@ echo -e " > ${CSUCCESS}The electrs.toml file has been updated!${COFF}"
 echo -e " > ${CINFO}Running bitcoind and bitcoin_gui containers...${COFF}"
 docker-compose --log-level ERROR -p crypto --file ./compose/docker-bitcoin.yml up 
 echo -e " > ${CSUCCESS}Containers launched!${COFF}"
-# if ( ! docker logs bitcoin_gui > /dev/null); then
-# 	echo -e " > ${CERROR}Bitcoin Node UI is not running due to an error.${COFF}"
-# 	exit 1
-# else
-# 	echo -e " > ${CINFO}Bitcoin Node UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_BITCOIN_GUI_PORT} ${COFF}"
-# fi
+if ( ! docker logs bitcoin_gui > /dev/null); then
+	echo -e " > ${CERROR}Bitcoin Node UI is not running due to an error.${COFF}"
+	exit 1
+else
+	echo -e " > ${CINFO}Bitcoin Node UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_BITCOIN_GUI_PORT} ${COFF}"
+fi
 
 # # Runs the 'electrs', 'electrs_gui' and 'explorer' containers.
 # echo -e " > ${CINFO}Running electrs electrs_gui and explorer containers...${COFF}"
