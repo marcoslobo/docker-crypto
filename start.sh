@@ -407,7 +407,7 @@ BIN_ARGS_BITCOIND+=( "-zmqpubhashblock=tcp://0.0.0.0:28334" )
 BIN_ARGS_BITCOIND+=( "-zmqpubsequence=tcp://0.0.0.0:28335" )
 BIN_ARGS_BITCOIND+=( "-deprecatedrpc=create_bd" )
 BIN_ARGS_BITCOIND+=( "-deprecatedrpc=warnings" )
-BIN_ARGS_BITCOIND+=( "-testnet4=1" )
+BIN_ARGS_BITCOIND+=( "-testnet4" )
 
 # Exporting the generated command to the compose file.
 export APP_BITCOIN_COMMAND=$(IFS=" "; echo -e "${BIN_ARGS_BITCOIND[@]}" | tr -d '"')
@@ -427,7 +427,7 @@ echo -e " > ${CSUCCESS}The electrs.toml file has been updated!${COFF}"
 
 # Runs the 'bitcoind' and 'bitcoin_gui' containers.
 echo -e " > ${CINFO}Running bitcoind and bitcoin_gui containers...${COFF}"
-docker-compose --log-level ERROR -p crypto --file ./compose/docker-bitcoin.yml up 
+docker-compose --log-level ERROR -p crypto --file ./compose/docker-bitcoin.yml up --detach bitcoind bitcoin_gui
 echo -e " > ${CSUCCESS}Containers launched!${COFF}"
 if ( ! docker logs bitcoin_gui > /dev/null); then
 	echo -e " > ${CERROR}Bitcoin Node UI is not running due to an error.${COFF}"

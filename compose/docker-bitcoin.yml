@@ -9,8 +9,8 @@ services:
     user: "${APP_BITCOIND_USER_INFO}"
     stop_grace_period: 15m30s
     ports:
-      - "8332:8332"
-      - "8333:8333"
+      - "${APP_BITCOIND_P2P_PORT}:${APP_BITCOIND_P2P_PORT}"
+      - "${APP_BITCOIND_RPC_PORT}:${APP_BITCOIND_RPC_PORT}"
     volumes:
       - "../volumes/bitcoin/node:/root/.bitcoin"
     networks:
