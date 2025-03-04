@@ -16,7 +16,7 @@ INIT_LAUNCH="False"
 INIT_LAUNCH_FILE="./volumes/.init"
 
 # Set bitcoin network used. Default is mainnet. Other options are testnet, regtest and signet.
-STACK_CRYPTO_NETWORK="mainnet"
+STACK_CRYPTO_NETWORK="testnet4"
 
 # Toggle optional script features. Change this if needed, as per your preference.
 STACK_CHECK_UPDATES="False" ## Check for system updates using APT package manager.
@@ -273,7 +273,7 @@ if [[ "${INIT_LAUNCH}" == "True" ]]; then
 else
 	echo -e " > ${CINFO}Checking for container updates...${COFF}"
 fi
-docker-compose --log-level ERROR --file ./compose/docker-tor.yml --file ./compose/docker-bitcoin.yml --file ./compose/docker-electrs.yml --file ./compose/docker-lightning.yml --file ./compose/docker-extras.yml pull
+docker-compose --log-level ERROR --file ./compose/docker-tor.yml --file ./compose/docker-bitcoin.yml 
 echo -e " > ${CSUCCESS}Docker containers have been pulled as needed!${COFF}"
 
 # Hashes provided tor password.
@@ -427,14 +427,14 @@ echo -e " > ${CSUCCESS}The electrs.toml file has been updated!${COFF}"
 
 # Runs the 'bitcoind' and 'bitcoin_gui' containers.
 echo -e " > ${CINFO}Running bitcoind and bitcoin_gui containers...${COFF}"
-docker-compose --log-level ERROR -p crypto --file ./compose/docker-bitcoin.yml up --detach bitcoind bitcoin_gui
+docker-compose --log-level ERROR -p crypto --file ./compose/docker-bitcoin.yml up 
 echo -e " > ${CSUCCESS}Containers launched!${COFF}"
-if ( ! docker logs bitcoin_gui > /dev/null); then
-	echo -e " > ${CERROR}Bitcoin Node UI is not running due to an error.${COFF}"
-	exit 1
-else
-	echo -e " > ${CINFO}Bitcoin Node UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_BITCOIN_GUI_PORT} ${COFF}"
-fi
+# if ( ! docker logs bitcoin_gui > /dev/null); then
+# 	echo -e " > ${CERROR}Bitcoin Node UI is not running due to an error.${COFF}"
+# 	exit 1
+# else
+# 	echo -e " > ${CINFO}Bitcoin Node UI is running on${COFF}${CLINK} http://${DEVICE_DOMAIN_NAME}:${STACK_BITCOIN_GUI_PORT} ${COFF}"
+# fi
 
 # # Runs the 'electrs', 'electrs_gui' and 'explorer' containers.
 # echo -e " > ${CINFO}Running electrs electrs_gui and explorer containers...${COFF}"
